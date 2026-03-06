@@ -20,8 +20,12 @@ class Player(arcade.Sprite):
 
         self.can_jump = False
         self.facing_right = True
+        
+        # Динамические параметры (могут изменяться из DevPanel)
+        self.jump_speed = PLAYER_JUMP_SPEED
+        self.move_speed = PLAYER_MOVE_SPEED
 
-    def update(self):
+    def update(self, delta_time: float = 1 / 60, *args, **kwargs):
         """Обновление состояния игрока."""
         if self.change_x > 0:
             self.facing_right = True
@@ -31,16 +35,16 @@ class Player(arcade.Sprite):
     def jump(self):
         """Прыжок."""
         if self.can_jump:
-            self.change_y = PLAYER_JUMP_SPEED
+            self.change_y = self.jump_speed
             self.can_jump = False
 
     def move_left(self):
         """Движение влево."""
-        self.change_x = -PLAYER_MOVE_SPEED
+        self.change_x = -self.move_speed
 
     def move_right(self):
         """Движение вправо."""
-        self.change_x = PLAYER_MOVE_SPEED
+        self.change_x = self.move_speed
 
     def stop(self):
         """Остановка горизонтального движения."""

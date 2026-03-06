@@ -2,6 +2,9 @@
 
 from pathlib import Path
 
+# Режим разработки (для production поставить False)
+DEV_MODE = True
+
 # Корень проекта
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -30,6 +33,13 @@ PLAYER_MAX_HORIZONTAL_SPEED = 10
 PLAYER_MAX_VERTICAL_SPEED = 10
 PLAYER_FRICTION = 1.0
 WALL_FRICTION = 0.7
+
+# Хрупкие платформы
+FRAGILE_BREAK_DELAY = 0.4
+
+# Скользкие платформы
+ICE_ACCELERATION = 0.3
+ICE_DECELERATION = 0.05
 
 # Камера
 VIEWPORT_MARGIN_LEFT = 250
