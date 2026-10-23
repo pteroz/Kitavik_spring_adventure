@@ -1,0 +1,315 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/level.gd" id="1_7dxvt"]
+[ext_resource type="Texture2D" path="res://assets/images/tiles/grass_ground.png" id="2_6g5uf"]
+[ext_resource type="Script" path="res://scripts/moving_platform.gd" id="3_vogc1"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="4_tdoqa"]
+[ext_resource type="Texture2D" path="res://assets/images/player/kitavik.png" id="5_ddr63"]
+[ext_resource type="Script" path="res://scripts/enemy_rat.gd" id="6_0dj0t"]
+[ext_resource type="Texture2D" path="res://assets/images/enemies/rat_enemy.png" id="7_w0l5l"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="8_e0wnd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_n44uc"]
+size = Vector2(720, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nuslc"]
+size = Vector2(160, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_re6lg"]
+size = Vector2(140, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1pn8n"]
+size = Vector2(140, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vnuhc"]
+size = Vector2(140, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sgyyf"]
+size = Vector2(548, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_blca8"]
+size = Vector2(20, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dsidl"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_04equ"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4xcco"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6rn2f"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plnnl"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ow23l"]
+size = Vector2(26, 20)
+
+[node name="LevelTest" type="Node2D" unique_id=1374273280]
+script = ExtResource("1_7dxvt")
+
+[node name="Sky" type="ColorRect" parent="." unique_id=1264138303]
+z_index = -100
+offset_left = -400.0
+offset_top = -400.0
+offset_right = 2448.0
+offset_bottom = 880.0
+color = Color(0.04, 0.06, 0.12, 1)
+
+[node name="SpawnPoint" type="Marker2D" parent="." unique_id=591314689]
+position = Vector2(120, 360)
+
+[node name="Platform" type="StaticBody2D" parent="." unique_id=113983389]
+position = Vector2(360, 440)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform" unique_id=990657410]
+shape = SubResource("RectangleShape2D_n44uc")
+
+[node name="Soil" type="ColorRect" parent="Platform" unique_id=1610097969]
+offset_left = -360.0
+offset_top = -40.0
+offset_right = 360.0
+offset_bottom = 40.0
+color = Color(0.36, 0.24, 0.14, 1)
+
+[node name="Grass" type="TextureRect" parent="Platform" unique_id=2092261366]
+texture_repeat = 2
+offset_left = -360.0
+offset_top = -40.0
+offset_right = 360.0
+offset_bottom = -8.0
+texture = ExtResource("2_6g5uf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="@StaticBody2D@2" type="StaticBody2D" parent="." unique_id=826976633]
+position = Vector2(880, 336)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@StaticBody2D@2" unique_id=27769780]
+shape = SubResource("RectangleShape2D_nuslc")
+
+[node name="Soil" type="ColorRect" parent="@StaticBody2D@2" unique_id=1187431822]
+offset_left = -80.0
+offset_top = -16.0
+offset_right = 80.0
+offset_bottom = 16.0
+color = Color(0.36, 0.24, 0.14, 1)
+
+[node name="Grass" type="TextureRect" parent="@StaticBody2D@2" unique_id=827182418]
+texture_repeat = 2
+offset_left = -80.0
+offset_top = -16.0
+offset_right = 80.0
+offset_bottom = 16.0
+texture = ExtResource("2_6g5uf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="@StaticBody2D@3" type="StaticBody2D" parent="." unique_id=990524284]
+position = Vector2(1070, 252)
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@StaticBody2D@3" unique_id=1259260584]
+shape = SubResource("RectangleShape2D_re6lg")
+one_way_collision = true
+
+[node name="Soil" type="ColorRect" parent="@StaticBody2D@3" unique_id=1942037310]
+offset_left = -70.0
+offset_top = -12.0
+offset_right = 70.0
+offset_bottom = 12.0
+color = Color(0.36, 0.24, 0.14, 1)
+
+[node name="Grass" type="TextureRect" parent="@StaticBody2D@3" unique_id=2009725671]
+texture_repeat = 2
+offset_left = -70.0
+offset_top = -12.0
+offset_right = 70.0
+offset_bottom = 12.0
+texture = ExtResource("2_6g5uf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="@StaticBody2D@4" type="StaticBody2D" parent="." unique_id=1344750020]
+position = Vector2(1250, 172)
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@StaticBody2D@4" unique_id=351685876]
+shape = SubResource("RectangleShape2D_1pn8n")
+one_way_collision = true
+
+[node name="Soil" type="ColorRect" parent="@StaticBody2D@4" unique_id=133860392]
+offset_left = -70.0
+offset_top = -12.0
+offset_right = 70.0
+offset_bottom = 12.0
+color = Color(0.36, 0.24, 0.14, 1)
+
+[node name="Grass" type="TextureRect" parent="@StaticBody2D@4" unique_id=575918517]
+texture_repeat = 2
+offset_left = -70.0
+offset_top = -12.0
+offset_right = 70.0
+offset_bottom = 12.0
+texture = ExtResource("2_6g5uf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="MovingPlatform" type="AnimatableBody2D" parent="." unique_id=908966049]
+position = Vector2(1400, 300)
+collision_mask = 0
+script = ExtResource("3_vogc1")
+travel = Vector2(0, -160)
+period = 3.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovingPlatform" unique_id=732052649]
+shape = SubResource("RectangleShape2D_vnuhc")
+
+[node name="Soil" type="ColorRect" parent="MovingPlatform" unique_id=2079547755]
+offset_left = -70.0
+offset_top = -14.0
+offset_right = 70.0
+offset_bottom = 14.0
+color = Color(0.3, 0.3, 0.42, 1)
+
+[node name="Grass" type="TextureRect" parent="MovingPlatform" unique_id=548459472]
+texture_repeat = 2
+offset_left = -70.0
+offset_top = -14.0
+offset_right = 70.0
+offset_bottom = 14.0
+texture = ExtResource("2_6g5uf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="@StaticBody2D@5" type="StaticBody2D" parent="." unique_id=947336581]
+position = Vector2(1774, 440)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@StaticBody2D@5" unique_id=1987583704]
+shape = SubResource("RectangleShape2D_sgyyf")
+
+[node name="Soil" type="ColorRect" parent="@StaticBody2D@5" unique_id=634639448]
+offset_left = -274.0
+offset_top = -40.0
+offset_right = 274.0
+offset_bottom = 40.0
+color = Color(0.36, 0.24, 0.14, 1)
+
+[node name="Grass" type="TextureRect" parent="@StaticBody2D@5" unique_id=991480172]
+texture_repeat = 2
+offset_left = -274.0
+offset_top = -40.0
+offset_right = 274.0
+offset_bottom = -8.0
+texture = ExtResource("2_6g5uf")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1566862232]
+position = Vector2(120, 360)
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("4_tdoqa")
+
+[node name="Sprite" type="Sprite2D" parent="Player" unique_id=1492124137]
+texture = ExtResource("5_ddr63")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1696520461]
+shape = SubResource("RectangleShape2D_blca8")
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=318147123]
+zoom = Vector2(1.7, 1.7)
+limit_left = 0
+limit_top = 0
+limit_right = 2048
+limit_bottom = 480
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="Enemy" type="CharacterBody2D" parent="." unique_id=2120161519]
+position = Vector2(400, 380)
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("6_0dj0t")
+
+[node name="Sprite" type="Sprite2D" parent="Enemy" unique_id=31174390]
+texture = ExtResource("7_w0l5l")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy" unique_id=1864144418]
+shape = SubResource("RectangleShape2D_dsidl")
+
+[node name="HurtBox" type="Area2D" parent="Enemy" unique_id=1885385738]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy/HurtBox" unique_id=583236160]
+shape = SubResource("RectangleShape2D_04equ")
+
+[node name="@CharacterBody2D@6" type="CharacterBody2D" parent="." unique_id=1947323970]
+position = Vector2(1700, 380)
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("6_0dj0t")
+
+[node name="Sprite" type="Sprite2D" parent="@CharacterBody2D@6" unique_id=414580625]
+texture = ExtResource("7_w0l5l")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@CharacterBody2D@6" unique_id=1968456293]
+shape = SubResource("RectangleShape2D_4xcco")
+
+[node name="HurtBox" type="Area2D" parent="@CharacterBody2D@6" unique_id=265744954]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@CharacterBody2D@6/HurtBox" unique_id=1240527031]
+shape = SubResource("RectangleShape2D_6rn2f")
+
+[node name="@CharacterBody2D@7" type="CharacterBody2D" parent="." unique_id=1692531543]
+position = Vector2(1900, 380)
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("6_0dj0t")
+
+[node name="Sprite" type="Sprite2D" parent="@CharacterBody2D@7" unique_id=1346542123]
+texture = ExtResource("7_w0l5l")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@CharacterBody2D@7" unique_id=1555516435]
+shape = SubResource("RectangleShape2D_plnnl")
+
+[node name="HurtBox" type="Area2D" parent="@CharacterBody2D@7" unique_id=439262566]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="@CharacterBody2D@7/HurtBox" unique_id=1778181463]
+shape = SubResource("RectangleShape2D_ow23l")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1978707521]
+script = ExtResource("8_e0wnd")
+
+[node name="Info" type="Label" parent="HUD" unique_id=1932258539]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 16.0
+offset_bottom = 12.0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+
+[node name="Fps" type="Label" parent="HUD" unique_id=2012440518]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -160.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.6, 0.95, 0.6, 1)
+horizontal_alignment = 2

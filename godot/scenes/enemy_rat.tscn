@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_rat.gd" id="1_pbvnw"]
+[ext_resource type="Texture2D" path="res://assets/images/enemies/rat_enemy.png" id="2_cbrbd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hahqk"]
+size = Vector2(26, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s8bg6"]
+size = Vector2(26, 20)
+
+[node name="EnemyRat" type="CharacterBody2D" unique_id=1828276092]
+collision_layer = 0
+collision_mask = 3
+script = ExtResource("1_pbvnw")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1201438656]
+texture = ExtResource("2_cbrbd")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1594923515]
+shape = SubResource("RectangleShape2D_hahqk")
+
+[node name="HurtBox" type="Area2D" parent="." unique_id=130223206]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=1009070631]
+shape = SubResource("RectangleShape2D_s8bg6")

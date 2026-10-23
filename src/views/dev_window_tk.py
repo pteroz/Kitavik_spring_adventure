@@ -14,11 +14,37 @@ class DevWindowTk:
     def __init__(self, game_view):
         self.game_view = game_view
         
-        # Текущие значения
-        self.gravity = game_view.current_gravity
-        self.jump_speed = game_view.current_jump_speed
-        self.move_speed = game_view.current_move_speed
-        self.player_scaling = game_view.current_player_scaling
+        # Импортируем константы pymunk
+        from src.constants import (
+            CAMERA_ZOOM,
+            GRAVITY,
+            PLAYER_MOVE_FORCE_SLOW,
+            PLAYER_MOVE_FORCE_NORMAL,
+            PLAYER_MOVE_FORCE_RUN,
+            PLAYER_JUMP_IMPULSE,
+            PLAYER_JUMP_IMPULSE_WALK,
+            PLAYER_JUMP_IMPULSE_RUN,
+            MOVE_SLOW_THRESHOLD,
+            DOUBLE_TAP_THRESHOLD,
+            ENEMY_SCALING,
+        )
+        
+        # Текущие значения параметров pymunk
+        self.gravity = GRAVITY
+        self.force_tap = PLAYER_MOVE_FORCE_SLOW
+        self.force_walk = PLAYER_MOVE_FORCE_NORMAL
+        self.force_run = PLAYER_MOVE_FORCE_RUN
+        self.jump_stand = PLAYER_JUMP_IMPULSE
+        self.jump_walk = PLAYER_JUMP_IMPULSE_WALK
+        self.jump_run = PLAYER_JUMP_IMPULSE_RUN
+        self.tap_threshold = MOVE_SLOW_THRESHOLD * 1000  # мс
+        self.doubletap_threshold = DOUBLE_TAP_THRESHOLD * 1000  # мс
+        
+        # Параметры камеры
+        self.camera_zoom = CAMERA_ZOOM
+        
+        # Параметры врагов
+        self.enemy_scale = ENEMY_SCALING
         
         # Процесс для мониторинга
         self.process = psutil.Process()
@@ -31,15 +57,39 @@ class DevWindowTk:
         """Создание окна tkinter."""
         self.window = tk.Tk()
         self.window.title("Dev Panel")
-        self.window.geometry("400x750")
+        self.window.geometry("420x750")
         self.window.resizable(False, False)
         
-        # Заголовок
+        # Заголовок (фиксированный)
         title = tk.Label(self.window, text="DEV PANEL", font=("Arial", 16, "bold"), fg="orange")
         title.pack(pady=10)
         
+        # Создаем Canvas с прокруткой для остального содержимого
+        canvas = tk.Canvas(self.window, highlightthickness=0)
+        scrollbar = tk.Scrollbar(self.window, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = tk.Frame(canvas)
+        
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Прокрутка колесиком мыши
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
         # Системная информация
-        sys_frame = tk.LabelFrame(self.window, text="System Info", font=("Arial", 10, "bold"), fg="blue")
+        sys_frame = tk.LabelFrame(self.scrollable_frame, text="System Info", font=("Arial", 10, "bold"), fg="blue")
         sys_frame.pack(pady=5, padx=20, fill=tk.X)
         
         self.cpu_label = tk.Label(sys_frame, text="CPU: ---%", font=("Arial", 9), anchor=tk.W)
@@ -55,23 +105,64 @@ class DevWindowTk:
             self.vram_label = tk.Label(sys_frame, text="VRAM: --- MB", font=("Arial", 9), anchor=tk.W)
             self.vram_label.pack(anchor=tk.W, padx=10, pady=2)
         
-        tk.Frame(self.window, height=2, bg="gray").pack(fill=tk.X, pady=10)
+        tk.Frame(self.scrollable_frame, height=2, bg="gray").pack(fill=tk.X, pady=10)
         
-        # GRAVITY
-        self._create_param("Gravity", self.gravity, 20, 200, "gravity")
+        # === PYMUNK ПАРАМЕТРЫ ===
+        pymunk_label = tk.Label(self.scrollable_frame, text="PYMUNK PARAMS", font=("Arial", 12, "bold"), fg="cyan")
+        pymunk_label.pack(pady=5)
         
-        # JUMP SPEED
-        self._create_param("Jump Speed", self.jump_speed, 5, 50, "jump_speed")
+        # Силы движения
+        self._create_param("Force Tap", self.force_tap, 100, 2000, "force_tap")
+        self._create_param("Force Walk", self.force_walk, 500, 5000, "force_walk")
+        self._create_param("Force Run", self.force_run, 3000, 15000, "force_run")
         
-        # MOVE SPEED
-        self._create_param("Move Speed", self.move_speed, 2, 30, "move_speed")
+        # Импульсы прыжка
+        self._create_param("Jump Stand", self.jump_stand, 500, 3000, "jump_stand")
+        self._create_param("Jump Walk", self.jump_walk, 500, 3000, "jump_walk")
+        self._create_param("Jump Run", self.jump_run, 500, 3000, "jump_run")
         
-        # PLAYER SCALING
-        self._create_param("Player Scale", self.player_scaling, 0.2, 2.0, "player_scaling")
+        # Таймеры (мс)
+        self._create_param("Tap Threshold (ms)", self.tap_threshold, 50, 500, "tap_threshold")
+        self._create_param("DoubleTap (ms)", self.doubletap_threshold, 50, 500, "doubletap_threshold")
+        
+        # Гравитация
+        self._create_param("Gravity", self.gravity, 500, 3000, "gravity")
+        
+        # Разделитель
+        tk.Frame(self.scrollable_frame, height=2, bg="gray").pack(fill=tk.X, pady=10)
+        
+        # === CAMERA ПАРАМЕТРЫ ===
+        camera_label = tk.Label(self.scrollable_frame, text="CAMERA PARAMS", font=("Arial", 12, "bold"), fg="blue")
+        camera_label.pack(pady=5)
+        
+        # Zoom камеры
+        self._create_param("Camera Zoom", self.camera_zoom, 0.5, 3.0, "camera_zoom")
+        
+        # Разделитель
+        tk.Frame(self.scrollable_frame, height=2, bg="gray").pack(fill=tk.X, pady=10)
+        
+        # === ENEMIES ПАРАМЕТРЫ ===
+        enemies_label = tk.Label(self.scrollable_frame, text="ENEMIES PARAMS", font=("Arial", 12, "bold"), fg="red")
+        enemies_label.pack(pady=5)
+        
+        # Масштаб врагов
+        self._create_param("Enemy Scale", self.enemy_scale, 0.5, 3.0, "enemy_scale")
         
         # Кнопки
-        btn_frame = tk.Frame(self.window)
+        btn_frame = tk.Frame(self.scrollable_frame)
         btn_frame.pack(pady=20)
+        
+        # Кнопка применения параметров
+        apply_btn = tk.Button(
+            btn_frame, 
+            text="Apply Params", 
+            command=self._apply_settings, 
+            width=15,
+            bg="#4CAF50",
+            fg="white",
+            font=("Arial", 10, "bold")
+        )
+        apply_btn.pack(pady=5)
         
         reload_btn = tk.Button(btn_frame, text="Restart Level", command=self._reload_level, width=15)
         reload_btn.pack(pady=5)
@@ -81,7 +172,7 @@ class DevWindowTk:
 
     def _create_param(self, label_text, initial_value, min_val, max_val, attr_name):
         """Создание секции параметра с полем ввода и слайдером."""
-        frame = tk.Frame(self.window)
+        frame = tk.Frame(self.scrollable_frame)
         frame.pack(pady=5, padx=20, fill=tk.X)
         
         # Заголовок
@@ -122,7 +213,7 @@ class DevWindowTk:
         slider.set(initial_value)
         slider.pack(fill=tk.X)
         
-        # Применение значения из поля ввода
+        # Применение значения из поля ввода (только локально, без применения к игре)
         def apply_entry_value(event=None):
             try:
                 current_min = float(min_var.get())
@@ -132,7 +223,6 @@ class DevWindowTk:
                 if current_min <= val <= current_max:
                     slider.set(val)
                     setattr(self, attr_name, val)
-                    self._apply_settings()
                     entry.config(bg="white")
                 else:
                     entry.config(bg="#ffcccc")  # Красный фон если вне диапазона
@@ -171,12 +261,28 @@ class DevWindowTk:
         slider.config(command=on_slider_change)
 
     def _apply_settings(self):
-        """Применить настройки к игре."""
-        self.game_view.apply_dev_settings(
-            gravity=self.gravity,
-            jump_speed=self.jump_speed,
-            move_speed=self.move_speed,
-            player_scaling=self.player_scaling,
+        """Применить настройки pymunk к игре через метод GameView."""
+        # Вызываем метод GameView для применения параметров pymunk
+        self.game_view.apply_pymunk_settings(
+            force_tap=self.force_tap,
+            force_walk=self.force_walk,
+            force_run=self.force_run,
+            jump_stand=self.jump_stand,
+            jump_walk=self.jump_walk,
+            jump_run=self.jump_run,
+            tap_threshold=self.tap_threshold / 1000.0,  
+            doubletap_threshold=self.doubletap_threshold / 1000.0,  
+            gravity=self.gravity
+        )
+        
+        # Применяем настройки камеры
+        self.game_view.apply_camera_settings(
+            camera_zoom=self.camera_zoom
+        )
+        
+        # Применяем настройки врагов
+        self.game_view.apply_enemy_settings(
+            enemy_scale=self.enemy_scale
         )
 
     def _reload_level(self):
