@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Kitavik (Godot)"
+config/name="Kitavik Spring Adventure"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 run/main_scene="res://scenes/menu.tscn"
@@ -35,6 +35,7 @@ window/stretch/aspect="expand"
 
 renderer/rendering_method="mobile"
 textures/canvas_textures/default_texture_filter=0
+textures/vram_compression/import_etc2_astc=true
 2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true
 rendering_device/driver.windows="d3d12"
