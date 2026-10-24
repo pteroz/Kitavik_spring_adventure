@@ -1,0 +1,77 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/images/player/kitavik.png" id="1_idle"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/walk_1.png" id="2_walk1"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/walk_2.png" id="3_walk2"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/walk_3.png" id="4_walk3"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/walk_4.png" id="5_walk4"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/run_1.png" id="6_run1"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/run_2.png" id="7_run2"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/run_3.png" id="8_run3"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/run_4.png" id="9_run4"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/jump_1.png" id="10_jump1"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/jump_2.png" id="11_jump2"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/jump_3.png" id="12_jump3"]
+[ext_resource type="Texture2D" path="res://assets/images/player/animations/jump_4.png" id="13_jump4"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_idle")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_walk1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_walk2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_walk3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_walk4")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_run1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_run2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_run3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_run4")
+}],
+"loop": true,
+"name": &"run",
+"speed": 16.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_jump1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_jump2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_jump3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_jump4")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 10.0
+}]
