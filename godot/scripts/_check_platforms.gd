@@ -79,12 +79,31 @@ func _run() -> void:
 	var platforms := level.find_child("Platforms", true, false) as TileMapLayer
 	var total := platforms.get_used_cells().size()
 	var real_groups: Dictionary = level._classify_platform_cells(platforms)
-	_check(real_groups["normal"].size() == total,
-		"level1: все %d ячеек Platforms — обычные" % total)
-	_check(real_groups["slippery"].is_empty()
-		and real_groups["fragile"].is_empty()
-		and real_groups["breakable"].is_empty(),
-		"level1: специальных тайлов нет")
+
+	var slippery := 0
+	var surfaces := {}
+	for cell in platforms.get_used_cells():
+		var data := platforms.get_cell_tile_data(cell)
+		if data == null:
+			continue
+		if bool(data.get_meta("is_slippery", false)):
+			slippery += 1
+		var surface := String(data.get_meta("surface", ""))
+		if surface != "":
+			surfaces[surface] = int(surfaces.get(surface, 0)) + 1
+
+	_check(slippery > 0 and real_groups["slippery"].size() == slippery,
+		"level1: лёд размечен скользким (%d ячеек)" % slippery)
+	_check(real_groups["normal"].size() == total - slippery,
+		"level1: остальные %d ячеек Platforms — обычные" % (total - slippery))
+	_check(real_groups["fragile"].is_empty() and real_groups["breakable"].is_empty(),
+		"level1: хрупких и разбиваемых тайлов нет")
+	_check(int(surfaces.get("ice", 0)) > 0
+		and int(surfaces.get("snow", 0)) > 0
+		and int(surfaces.get("straw", 0)) > 0,
+		"level1: поверхности размечены (лёд %d, снег %d, солома %d)" % [
+			int(surfaces.get("ice", 0)), int(surfaces.get("snow", 0)),
+			int(surfaces.get("straw", 0))])
 
 	var player := level.get_node("Player") as CharacterBody2D
 	_check(player.floor_started.is_connected(Callable(level, "_on_player_floor")),

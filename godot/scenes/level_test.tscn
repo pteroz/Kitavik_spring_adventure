@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://assets/images/enemies/rat_enemy.png" id="7_w0l5l"]
 [ext_resource type="Script" path="res://scripts/hud.gd" id="8_e0wnd"]
 [ext_resource type="Script" path="res://scripts/player_shadow.gd" id="9_shadow"]
+[ext_resource type="Script" path="res://scripts/player_ground_fx.gd" id="10_fx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n44uc"]
 size = Vector2(720, 80)
@@ -219,6 +220,10 @@ position = Vector2(120, 360)
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("4_tdoqa")
+
+[node name="GroundFx" type="Node2D" parent="Player" unique_id=1183924056]
+top_level = true
+script = ExtResource("10_fx")
 
 [node name="Shadow" type="Node2D" parent="Player" unique_id=443918222]
 position = Vector2(0, 19.5)

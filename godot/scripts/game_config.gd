@@ -69,6 +69,7 @@ const ENEMY_HOP_VELOCITY := 800.0 # импульс 400 при массе 0.5 →
 const FRAGILE_BREAK_DELAY := 0.4   # таймер хрупкой платформы после наступания
 const ICE_ACCELERATION := 0.3      # множитель ускорения на скользком полу
 const ICE_DECELERATION := 0.05     # множитель трения на скользком полу
+const STRAW_SPEED_MULTIPLIER := 1.0 / 1.5  # ходьба и бег по соломе медленнее в 1.5 раза
 const MOVING_PLATFORM_SPEED := 120.0   # 2 px/кадр при 60 FPS
 const MOVING_PLATFORM_TRAVEL := 200.0  # размах ±100 px от центра (как boundary оригинала)
 

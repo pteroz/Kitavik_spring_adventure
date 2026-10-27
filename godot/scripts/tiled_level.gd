@@ -21,6 +21,7 @@ var _fragile_timers := {}
 
 func _ready() -> void:
 	_build_map()
+	player.setup_platform_layer(_platforms_layer)
 	player.floor_started.connect(_on_player_floor)
 	player.breakable_hit.connect(_on_breakable_hit)
 	player.died.connect(_on_death)

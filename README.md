@@ -31,7 +31,7 @@ flatpak run org.godotengine.Godot --headless --path . --export-release "macOS" b
 
 ```bash
 cd godot
-for s in _check_level _check_flow _check_coins _check_enemy _check_platforms _check_oneway _check_movement _check_fallback; do
+for s in _check_level _check_flow _check_coins _check_enemy _check_platforms _check_oneway _check_movement _check_fallback _check_ground_fx; do
   flatpak run org.godotengine.Godot --headless --path . -s "scripts/$s.gd" || break
 done
 ```

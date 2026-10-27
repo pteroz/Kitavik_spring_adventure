@@ -37,6 +37,89 @@
  </tileset>
  <tileset firstgid="65" name="spring_village_tileset" tilewidth="32" tileheight="32" tilecount="42" columns="6">
   <image source="../images/tiles/spring_village_tileset.png" width="192" height="224"/>
+  <tile id="0">
+   <properties>
+    <property name="surface" value="ice"/>
+    <property name="is_slippery" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="surface" value="ice"/>
+    <property name="is_slippery" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="surface" value="ice"/>
+    <property name="is_slippery" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="surface" value="snow"/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="surface" value="straw"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="surface" value="straw"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="surface" value="straw"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="surface" value="straw"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="107" name="grass_ground" tilewidth="32" tileheight="32" tilecount="60" columns="10">
   <image source="../images/tiles/grass_ground.png" width="320" height="192"/>

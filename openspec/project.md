@@ -39,8 +39,9 @@
 - `project.godot` — `config/name="Kitavik Spring Adventure"`, main scene `scenes/menu.tscn`, autoload `GameConfig`, gravity 1500, viewport 1280×720, pixel snap, nearest filter, ETC2/ASTC для macOS, YATI включён
 - `export_presets.cfg` — пресеты Linux / Windows / macOS (PCK встроен); сборка в `build/` (gitignored)
 - `scripts/game_config.gd` — все константы «ощущения» + InputMap
-- `scripts/player.gd` — CharacterBody2D: тап/ходьба/бег/воздух, даблтап-бег, трёхуровневый прыжок, койот, буфер, соскакивание, скользкий пол, удар головой в разбиваемый блок
-- `scripts/tiled_level.gd` — уровень из Tiled: коллизии из ячеек (слитые горизонтальные полосы), классификация спецтайлов по metadata, хрупкие/разбиваемые/скользкие платформы, движущиеся платформы, спавн, враги, границы камеры, респавн/рестарт, ESC → меню
+- `scripts/player.gd` — CharacterBody2D: тап/ходьба/бег/воздух, даблтап-бег, трёхуровневый прыжок, койот, буфер, соскакивание, скользкий пол, определение поверхности под лапами, замедление на соломе (×1.5), удар головой в разбиваемый блок
+- `scripts/player_ground_fx.gd` — эффекты поверхности в мировых координатах: соломинки на сене, затухающие следы на снегу
+- `scripts/tiled_level.gd` — уровень из Tiled: коллизии из ячеек (слитые горизонтальные полосы), классификация спецтайлов и поверхностей по metadata, хрупкие/разбиваемые/скользкие платформы, движущиеся платформы, спавн, враги, границы камеры, респавн/рестарт, ESC → меню
 - `scripts/menu.gd` — главное меню (ENTER → история, ESC → выход)
 - `scripts/story.gd` — слайды истории из `assets/story/level{N}.json` (ENTER/SPACE/→ далее, ← назад, ESC пропустить → уровень)
 - `scripts/enemy_rat.gd` — крыса: патруль, 3-кадровая походка, HurtBox
@@ -49,7 +50,7 @@
 - `scripts/hud.gd` — отладочный HUD + FPS (F1) + счёт «Очки: N»
 - `scenes/menu.tscn` — главное меню; `scenes/story.tscn` — экран истории; `scenes/coin.tscn` — монета
 - `scenes/level1.tscn` — основной уровень (Tiled + Player + HUD); `scenes/level_test.tscn` — синтетический тест-уровень
-- `scripts/_check_*.gd` — headless/оконные проверки: `_check_level`, `_check_flow`, `_check_coins`, `_check_enemy`, `_check_platforms`, `_check_oneway`, `_check_movement`, `_check_fallback`
+- `scripts/_check_*.gd` — headless/оконные проверки: `_check_level`, `_check_flow`, `_check_coins`, `_check_enemy`, `_check_platforms`, `_check_oneway`, `_check_movement`, `_check_fallback`, `_check_ground_fx`
 - `scripts/_scaffold.gd` — headless-генератор сцен прототипа
 - `assets/images|maps|story` — ассеты оригинала; `addons/YATI` — импортёр Tiled
 

@@ -35,6 +35,8 @@ var _drop_timer := 0.0
 
 var _floor_bodies: Array[Node2D] = []
 var _floor_slippery := false
+var _floor_surface := ""
+var _platform_layer: TileMapLayer
 var _broke_this_jump := false
 
 
@@ -113,6 +115,8 @@ func _apply_horizontal(delta: float, dir: float, on_floor: bool) -> void:
 		var cap := GameConfig.AIR_SPEED
 		if on_floor:
 			cap = GameConfig.TAP_SPEED if tapping else (GameConfig.RUN_SPEED if _want_run(dir) else GameConfig.WALK_SPEED)
+			if _floor_surface == "straw":
+				cap *= GameConfig.STRAW_SPEED_MULTIPLIER
 		var accel := GameConfig.TAP_ACCEL if tapping else (ground_accel if on_floor else GameConfig.AIR_ACCEL)
 		velocity.x = move_toward(velocity.x, side * cap, accel * delta)
 	else:
@@ -267,6 +271,7 @@ func _update_floor_contact() -> void:
 	if not is_on_floor():
 		_floor_bodies.clear()
 		_floor_slippery = false
+		_floor_surface = ""
 		return
 
 	var bodies := _find_floor_bodies()
@@ -280,6 +285,28 @@ func _update_floor_contact() -> void:
 		if not _floor_bodies.has(body):
 			floor_started.emit(body)
 	_floor_bodies = bodies
+	_floor_surface = _surface_under_feet()
+
+
+func setup_platform_layer(layer: TileMapLayer) -> void:
+	_platform_layer = layer
+	_floor_surface = ""
+
+
+func get_floor_surface() -> String:
+	return _floor_surface if is_on_floor() else ""
+
+
+## Тип поверхности берётся из свойства surface тайла прямо под лапами.
+func _surface_under_feet() -> String:
+	if _platform_layer == null:
+		return ""
+	var feet := global_position + Vector2(0.0, GameConfig.PLAYER_SIZE.y / 2.0 + 4.0)
+	var cell := _platform_layer.local_to_map(_platform_layer.to_local(feet))
+	var data := _platform_layer.get_cell_tile_data(cell)
+	if data == null:
+		return ""
+	return String(data.get_meta("surface", ""))
 
 
 func _find_floor_bodies() -> Array[Node2D]:
@@ -338,7 +365,11 @@ func respawn(at: Vector2) -> void:
 	_cancel_turn()
 	_floor_bodies.clear()
 	_floor_slippery = false
+	_floor_surface = ""
 	_broke_this_jump = false
+	var fx := get_node_or_null("GroundFx")
+	if fx != null:
+		fx.clear()
 
 
 func die() -> void:
