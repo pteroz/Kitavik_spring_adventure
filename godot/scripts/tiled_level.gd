@@ -7,6 +7,18 @@ const ENEMY_SCENE := preload("res://scenes/enemy_rat.tscn")
 const COIN_SCENE := preload("res://scenes/coin.tscn")
 const MOVING_PLATFORM_SCRIPT := preload("res://scripts/moving_platform.gd")
 
+const BG_SCROLL_X := 0.35     # фон движется медленнее мира по горизонтали
+const BG_SCROLL_Y := 0.13     # и по вертикали; медленнее, чтобы показать сарай целиком
+const BG_TEXELS_PER_PX := 1.0 # плотность текстуры: 1 пиксель картинки = 1 пиксель экрана
+const BG_REPEAT_TIMES := 4    # запас повторов влево/вправо
+
+const MID_IMAGE := "res://assets/images/backgrounds/06_mid_level_b.png"
+const MID_SCROLL_X := 0.65    # средний слой ближе к блокам: движется быстрее дальнего фона
+const MID_SCROLL_Y := 0.13    # по высоте держится вровень с дальним фоном
+const MID_TEXELS_PER_PX := 1.0
+const MID_BASELINE_RATIO := 0.85 # низ среднего слоя — под линией пола камеры
+const MID_TINT := Color(0.58, 0.6, 0.66) # приглушение: props не должны читаться как платформы
+
 @export var map_path := MAP_PATH
 
 @onready var player: CharacterBody2D = $Player
@@ -65,6 +77,8 @@ func _build_map() -> void:
 		_build_static(oneway.get_used_cells(), true)
 
 	var size := _map_size(map, platforms)
+	_setup_background(map, size)
+	_setup_midground(size)
 	_kill_y = size.y + 200.0
 	_place_camera(size)
 
@@ -130,6 +144,91 @@ func _map_size(map: Node2D, platforms: TileMapLayer) -> Vector2:
 		var r := platforms.get_used_rect()
 		return Vector2(r.size) * GameConfig.TILE
 	return Vector2(GameConfig.LEVEL_W, GameConfig.LEVEL_H)
+
+
+## Фон-сарай: параллакс по X и Y и бесшовный цикл по X. Картинка рисуется
+## с плотностью 1 тексель на экранный пиксель и потому не растягивается.
+## Parallax2D дополнительно смещает слой на (1 - фактор) * пол-экрана, поэтому
+## картинка центруется по видимому окну, а не по координатам мира.
+func _setup_background(map: Node2D, size: Vector2) -> void:
+	var src := map.find_child("BackImage", true, false) as TextureRect
+	if src == null or src.texture == null:
+		return
+	var tex := src.texture
+	src.queue_free()
+
+	var color := map.find_child("Background Color", true, false) as ColorRect
+	if color:
+		color.z_index = -3
+
+	var art := tex.get_size() * (BG_TEXELS_PER_PX / _camera_zoom())
+	_make_parallax("Backdrop", tex, art, Vector2(BG_SCROLL_X, BG_SCROLL_Y),
+		_background_top_y(art, size), -2)
+
+
+## Средний слой: props сарая на прозрачном фоне между дальним фоном и блоками.
+## Двигается быстрее дальнего фона по X, по высоте выровнен с ним.
+func _setup_midground(size: Vector2) -> void:
+	if not ResourceLoader.exists(MID_IMAGE):
+		return
+	var tex := load(MID_IMAGE) as Texture2D
+	if tex == null:
+		return
+	var art := tex.get_size() * (MID_TEXELS_PER_PX / _camera_zoom())
+	var window := _parallax_window(size, MID_SCROLL_Y)
+	var baseline := lerpf(window.x, window.y, MID_BASELINE_RATIO)
+	_make_parallax("Midground", tex, art, Vector2(MID_SCROLL_X, MID_SCROLL_Y),
+		baseline - art.y, -1, MID_TINT)
+
+
+## Пара «прямая + отражённая» копия с перекрытием на стыке: пиксельное
+## округление иначе оставляет 1-px щель с подложкой. Повторяется по X.
+func _make_parallax(name: String, tex: Texture2D, art: Vector2,
+		factors: Vector2, top_y: float, depth: int,
+		tint: Color = Color.WHITE) -> Parallax2D:
+	var overlap := 2.0 / _camera_zoom()
+	var layer := Parallax2D.new()
+	layer.name = name
+	layer.scroll_scale = factors
+	layer.repeat_size = Vector2(art.x * 2.0, 0.0)
+	layer.repeat_times = BG_REPEAT_TIMES
+	layer.z_index = depth
+	layer.modulate = tint
+	add_child(layer)
+
+	for flip in [false, true]:
+		var rect := TextureRect.new()
+		rect.texture = tex
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect.stretch_mode = TextureRect.STRETCH_SCALE
+		rect.size = Vector2(art.x + overlap, art.y)
+		rect.position = Vector2(art.x if flip else 0.0, top_y)
+		rect.flip_h = flip
+		rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		layer.add_child(rect)
+	return layer
+
+
+func _camera_zoom() -> float:
+	var cam := player.get_node_or_null("Camera2D") as Camera2D
+	return cam.zoom.y if cam else 1.7
+
+
+## Видимое окно слоя в локальных координатах параллакса на всём ходу камеры.
+func _parallax_window(size: Vector2, factor: float) -> Vector2:
+	var zoom := _camera_zoom()
+	var half_h := GameConfig.VIEWPORT_H / (2.0 * zoom)
+	var engine_shift := (1.0 - factor) * GameConfig.VIEWPORT_H / 2.0
+	return Vector2(
+		factor * half_h + engine_shift - half_h,
+		factor * (size.y - half_h) + engine_shift + half_h)
+
+
+## Верх картинки так, чтобы её центр совпал с центром видимого окна на всём
+## ходу камеры. Смещение самого Parallax2D — (1 - фактор) * пол-экрана.
+func _background_top_y(art: Vector2, size: Vector2) -> float:
+	var window := _parallax_window(size, BG_SCROLL_Y)
+	return (window.x + window.y - art.y) / 2.0
 
 
 func _place_camera(size: Vector2) -> void:

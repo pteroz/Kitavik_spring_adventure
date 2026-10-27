@@ -23,7 +23,7 @@
 - Уровень `level1.tmx`: 6219 ячеек, точка `PlayerSpawn`, 19 врагов, камера 0..6400×0..3200; запасной уровень при отсутствии карты
 - Игровой поток: меню → 3 сюжетных слайда → уровень; ESC → меню; R — рестарт; F1 — отладочный HUD и FPS
 - Специальные платформы: one-way, хрупкие (0.4 c), разбиваемые (удар головой), скользкие (явные `ICE_ACCELERATION`/`ICE_DECELERATION`), движущиеся (`AnimatableBody2D`, ±100 px по умолчанию)
-- Монеты/счёт, камера с зумом 1.70 и лимитами карты, параллакс из Tiled-слоёв
+- Монеты/счёт, камера с зумом 1.70 и лимитами карты, параллакс из Tiled-слоёв; фон-сарай — `Parallax2D` за блоками: плотность 1 тексель на экранный пиксель (мир. масштаб 1/zoom, без растяжения), фактор 0.35 по X и 0.13 по Y, бесшовный цикл по X (пара «прямая + отражённая» копия с перекрытием 2 экранных px на пиксельном стыке), зеркальные запасы по краям и центрирование по окну камеры — фон покрывает экран на всём ходу; прозрачные края тайлов `spring_village_tileset.png` залиты цветом соседних пикселей, поэтому фон не просвечивает в стыках блоков. Средний слой `06_mid_level_b.png` (сено, перила, лестницы) — между фоном и блоками: z −1, фактор 0.65 по X и 0.13 по Y, та же плотность 1:1, низ скрыт за полом, приглушён `modulate` (0.58, 0.6, 0.66), чтобы props не читались как платформы
 - Сборка: `godot/export_presets.cfg` — Linux x86_64, Windows x86_64, macOS universal (unsigned); PCK встраивается в бинарник. Артефакты — `godot/build/` (gitignored). Шаблоны экспорта 4.7.2 установлены в Flatpak-профиль (`~/.var/app/org.godotengine.Godot/data/godot/export_templates/4.7.2.stable/`, 2 ГБ)
 - Проверки: `godot/scripts/_check_*.gd` — headless и оконный прогон, все PASS; визуальное «ощущение» подтверждено пользователем 2026-10-24
 - Детали миграции — `changes/archive/migrate-to-godot/`
@@ -50,7 +50,7 @@
 - `scripts/hud.gd` — отладочный HUD + FPS (F1) + счёт «Очки: N»
 - `scenes/menu.tscn` — главное меню; `scenes/story.tscn` — экран истории; `scenes/coin.tscn` — монета
 - `scenes/level1.tscn` — основной уровень (Tiled + Player + HUD); `scenes/level_test.tscn` — синтетический тест-уровень
-- `scripts/_check_*.gd` — headless/оконные проверки: `_check_level`, `_check_flow`, `_check_coins`, `_check_enemy`, `_check_platforms`, `_check_oneway`, `_check_movement`, `_check_fallback`, `_check_ground_fx`
+- `scripts/_check_*.gd` — headless/оконные проверки: `_check_level`, `_check_flow`, `_check_coins`, `_check_enemy`, `_check_platforms`, `_check_oneway`, `_check_movement`, `_check_fallback`, `_check_ground_fx`, `_check_background`
 - `scripts/_scaffold.gd` — headless-генератор сцен прототипа
 - `assets/images|maps|story` — ассеты оригинала; `addons/YATI` — импортёр Tiled
 

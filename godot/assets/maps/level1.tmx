@@ -125,7 +125,7 @@
   <image source="../images/tiles/grass_ground.png" width="320" height="192"/>
  </tileset>
  <imagelayer id="10" name="BackImage" offsetx="-30.3747" offsety="1139.08">
-  <image source="../images/backgrounds/02_back.png" width="1536" height="1024"/>
+  <image source="../images/backgrounds/02_back_level.png" width="1536" height="1444"/>
  </imagelayer>
  <layer id="5" name="Background" width="200" height="100" visible="0" tintcolor="#b5835a">
   <data encoding="csv">
