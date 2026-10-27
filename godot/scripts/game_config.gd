@@ -21,31 +21,39 @@ const CAMERA_ZOOM := 1.7         # == CAMERA_ZOOM оригинала
 # --- Игрок (пересчитано из импульсов pymunk в скорости Godot) ---
 # В Arcade прыжок делался импульсом к телу массой PLAYER_MASS=2.0,
 # т.е. стартовая скорость ~ impulse/2. Здесь фиксируем эти скорости.
+# Темп 2026-10-27: движение и прыжки сначала замедлены в 1.4 раза, затем
+# до 3/4 текущей скорости (суммарно ×1.8667 от исходной). Скорости и
+# ускорения игрока умножены на 0.75, его гравитация — на 0.75², поэтому
+# высота прыжка сохраняется, а время в воздухе растёт ещё в 1.333 раза.
+# GRAVITY/MAX_FALL_SPEED ниже остаются общими для врагов.
 const GRAVITY := 1500.0
 const MAX_FALL_SPEED := 1500.0
+const PLAYER_GRAVITY := 430.5        # 1500 / 1.8667²
+const PLAYER_FALL_GRAVITY := PLAYER_GRAVITY * 1.5  # падение в 1.5 раза быстрее, подъём не меняется
+const PLAYER_MAX_FALL_SPEED := 803.6  # 1500 / 1.8667
 
-const WALK_SPEED := 260.0
-const RUN_SPEED := 450.0         # == PLAYER_MAX_HORIZONTAL_SPEED
-const AIR_SPEED := 380.0         # управление в воздухе чуть слабее земли
+const WALK_SPEED := 139.3        # 260 / 1.8667
+const RUN_SPEED := 241.1         # 450 / 1.8667 == PLAYER_MAX_HORIZONTAL_SPEED
+const AIR_SPEED := 203.6         # 380 / 1.8667: управление в воздухе чуть слабее земли
 
-const GROUND_ACCEL := 2400.0
-const AIR_ACCEL := 900.0
-const GROUND_FRICTION := 2800.0  # торможение при отпускании
+const GROUND_ACCEL := 1285.7     # 2400 / 1.8667
+const AIR_ACCEL := 482.2         # 900 / 1.8667
+const GROUND_FRICTION := 1500.0  # 2800 / 1.8667: торможение при отпускании
 const RUN_HOLD_THRESHOLD := 0.15 # == MOVE_SLOW_THRESHOLD: тап короче — минимальный рывок
-const TAP_ACCEL := 200.0         # == PLAYER_MOVE_FORCE_SLOW 400 / масса 2
-const TAP_SPEED := 30.0          # пик скорости за окно тапа (~2 px пути)
+const TAP_ACCEL := 107.2         # 200 / 1.8667 == PLAYER_MOVE_FORCE_SLOW 400 / масса 2
+const TAP_SPEED := 16.1          # 30 / 1.8667: пик скорости за окно тапа
 const DOUBLE_TAP_WINDOW := 0.25  # окно даблтапа (расширено с 0.15 для тач/клавиатуры)
 
 # Три уровня прыжка из оригинала (импульс / масса 2.0):
 # stand 1400/2, walk 1600/2, run 1800/2 — режим выбирается в момент прыжка.
-const JUMP_VELOCITY_STAND := 700.0
-const JUMP_VELOCITY_WALK := 800.0
-const JUMP_VELOCITY_RUN := 900.0
-const JUMP_CUTOFF_TIME := 0.15   # == JUMP_CUTOFF_TIME: окно, в котором отпускание гасит прыжок
+const JUMP_VELOCITY_STAND := 375.0  # 700 / 1.8667
+const JUMP_VELOCITY_WALK := 428.6   # 800 / 1.8667
+const JUMP_VELOCITY_RUN := 482.2    # 900 / 1.8667
+const JUMP_CUTOFF_TIME := 0.28   # 0.15 × 1.8667: окно, в котором отпускание гасит прыжок
 const JUMP_CUT_MULTIPLIER := 0.4 # == JUMP_CUTOFF_MULTIPLIER
 const COYOTE_TIME := 0.10        # прощение: прыжок сразу после схода с края
 const JUMP_BUFFER_TIME := 0.10   # прощение: нажатие чуть раньше приземления
-const DROP_THROUGH_TIME := 0.18  # как долго игрок "сквозь" one-way вниз
+const DROP_THROUGH_TIME := 0.34  # 0.18 × 1.8667: при медленном падении нужно дольше
 
 const PLAYER_SIZE := Vector2(20, 28)  # хитбокс (чуть уже спрайта 32x32)
 

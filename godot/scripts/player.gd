@@ -7,12 +7,15 @@ signal died
 signal floor_started(body: Node2D)
 signal breakable_hit(body: Node2D)
 
-const RUN_ANIM_SPEED := 320.0
-const AIR_APEX_SPEED := 220.0
+const RUN_ANIM_SPEED := 171.5  # 320 / 1.8667
+const AIR_APEX_SPEED := 117.8  # 220 / 1.8667
 const LAND_SQUASH_TIME := 0.10
-const LAND_SQUASH_MIN_SPEED := 300.0
+const LAND_SQUASH_MIN_SPEED := 160.7  # 300 / 1.8667
+const SHADOW_GROUND_ALPHA := 0.45
+const SHADOW_FADE_SPEED := 3.0
 
 @onready var sprite: AnimatedSprite2D = $Sprite
+@onready var shadow: Node2D = $Shadow
 
 var _facing := 1.0
 var _run_side := 0.0
@@ -21,6 +24,8 @@ var _hold_left := 0.0
 var _hold_right := 0.0
 var _t := 0.0
 var _land_squash := 0.0
+var _turning := false
+var _turn_target := 1.0
 
 var _coyote := 0.0
 var _jump_buffer := 0.0
@@ -31,6 +36,11 @@ var _drop_timer := 0.0
 var _floor_bodies: Array[Node2D] = []
 var _floor_slippery := false
 var _broke_this_jump := false
+
+
+func _ready() -> void:
+	sprite.animation_finished.connect(_on_sprite_animation_finished)
+	sprite.frame_changed.connect(_on_sprite_frame_changed)
 
 
 func _physics_process(delta: float) -> void:
@@ -54,6 +64,7 @@ func _physics_process(delta: float) -> void:
 	var fall_speed := velocity.y
 	move_and_slide()
 	_update_floor_contact()
+	_update_shadow(delta)
 	if rising:
 		_check_breakable_ceiling()
 	if not was_on_floor and is_on_floor() and fall_speed > LAND_SQUASH_MIN_SPEED:
@@ -82,8 +93,9 @@ func _want_run(dir: float) -> bool:
 func _apply_gravity(delta: float, on_floor: bool) -> void:
 	if on_floor:
 		return
-	velocity.y += GameConfig.GRAVITY * delta
-	velocity.y = minf(velocity.y, GameConfig.MAX_FALL_SPEED)
+	var gravity := GameConfig.PLAYER_FALL_GRAVITY if velocity.y > 0.0 else GameConfig.PLAYER_GRAVITY
+	velocity.y += gravity * delta
+	velocity.y = minf(velocity.y, GameConfig.PLAYER_MAX_FALL_SPEED)
 
 
 func _apply_horizontal(delta: float, dir: float, on_floor: bool) -> void:
@@ -122,6 +134,7 @@ func _handle_jump(delta: float, on_floor: bool, dir: float) -> void:
 		_coyote = 0.0
 		_jumping = true
 		_jump_start = _t
+		_cancel_turn()
 
 	# переменная высота: гасим подъём, только если отпустили в пределах окна
 	# (короткое нажатие = маленький прыжок, удержание дольше окна = полный)
@@ -151,13 +164,60 @@ func _handle_drop_through(delta: float) -> void:
 
 
 func _update_facing(dir: float) -> void:
-	if absf(dir) > 0.01:
-		_facing = signf(dir)
-	if sprite:
-		sprite.flip_h = _facing < 0.0
+	if absf(dir) <= 0.01 or _turning:
+		return
+	var new_facing := signf(dir)
+	if new_facing == _facing:
+		return
+	_facing = new_facing
+	if not is_on_floor():
+		if sprite:
+			sprite.flip_h = _facing < 0.0
+		return
+	_start_turn(_facing)
+
+
+func _start_turn(target: float) -> void:
+	_turning = true
+	_turn_target = target
+	sprite.speed_scale = 1.0
+	# Полный клип turn сохранён в ресурсе; в игре видны только начало и конец.
+	sprite.play(&"turn_short")
+
+
+func _finish_turn() -> void:
+	_turning = false
+	_facing = _turn_target
+	sprite.flip_h = _facing < 0.0
+	_update_animation()
+
+
+func _cancel_turn() -> void:
+	if not _turning:
+		return
+	_turning = false
+	_facing = _turn_target
+	sprite.flip_h = _facing < 0.0
+
+
+func _on_sprite_frame_changed() -> void:
+	if not _turning:
+		return
+	if sprite.animation != &"turn" and sprite.animation != &"turn_short":
+		return
+	var flip_at := sprite.sprite_frames.get_frame_count(sprite.animation) / 2
+	if sprite.frame >= flip_at:
+		sprite.flip_h = _turn_target < 0.0
+
+
+func _on_sprite_animation_finished() -> void:
+	if sprite.animation == &"turn" or sprite.animation == &"turn_short":
+		_finish_turn()
 
 
 func _update_animation() -> void:
+	if _turning:
+		return
 	if not is_on_floor():
 		if velocity.y < -AIR_APEX_SPEED:
 			_show_jump_frame(1)
@@ -184,7 +244,7 @@ func _play_loop(anim: StringName) -> void:
 		sprite.speed_scale = 1.0
 		return
 	var ref_speed := GameConfig.RUN_SPEED if anim == &"run" else GameConfig.WALK_SPEED
-	sprite.speed_scale = clampf(absf(velocity.x) / ref_speed, 0.7, 1.3)
+	sprite.speed_scale = clampf(absf(velocity.x) / ref_speed, 0.8, 1.0)
 
 
 ## Кадры прыжка выбираются по фазе: 1 — подъём, 2 — вершина, 3 — падение.
@@ -196,6 +256,11 @@ func _show_jump_frame(index: int) -> void:
 		sprite.pause()
 	if sprite.frame != index:
 		sprite.frame = index
+
+
+func _update_shadow(delta: float) -> void:
+	var target := SHADOW_GROUND_ALPHA if is_on_floor() else 0.0
+	shadow.modulate.a = move_toward(shadow.modulate.a, target, SHADOW_FADE_SPEED * delta)
 
 
 func _update_floor_contact() -> void:
@@ -270,6 +335,7 @@ func respawn(at: Vector2) -> void:
 	_jumping = false
 	_run_side = 0.0
 	_land_squash = 0.0
+	_cancel_turn()
 	_floor_bodies.clear()
 	_floor_slippery = false
 	_broke_this_jump = false

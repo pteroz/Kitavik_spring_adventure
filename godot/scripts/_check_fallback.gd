@@ -19,7 +19,8 @@ func _run() -> void:
 	root.add_child(level)
 	await process_frame
 
-	for i in range(30):
+	# 60 кадров: при замедленной гравитации игрок падает на площадку дольше.
+	for i in range(60):
 		await physics_frame
 
 	var player := level.get_node("Player") as CharacterBody2D

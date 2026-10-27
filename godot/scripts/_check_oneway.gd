@@ -40,14 +40,18 @@ func _run() -> void:
 	player.position = Vector2(0, 180)
 	world.add_child(player)
 
-	for i in range(10):
+	# 20 кадров: при замедленной гравитации падение на 6 px занимает ~10 кадров,
+	# прежних 10 не хватало на устойчивое приземление.
+	for i in range(20):
 		await physics_frame
 	_check(player.is_on_floor(), "one-way: игрок на твёрдом полу (y=%.1f)" % player.global_position.y)
 
 	player.velocity.y = -900.0
 	var passed_through := false
 	var landed_y := 0.0
-	for i in range(120):
+	# 300 кадров: при замедленной гравитации игрока полёт до верхней площадки
+	# занимает ~4.1 с, прежних 240 кадров (4 с) уже не хватает.
+	for i in range(300):
 		await physics_frame
 		if player.velocity.y < 0.0 and player.global_position.y < 70.0:
 			passed_through = true
